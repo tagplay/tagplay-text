@@ -1,0 +1,22 @@
+{
+  "name": "tagplay-text",
+  "version": "0.0.1",
+  "description": "A text processing helper lib for Tagplay.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tagplay/tagplay-text.git"
+  },
+  "author": "Tagplay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tagplay/tagplay-text/issues"
+  },
+  "homepage": "https://github.com/tagplay/tagplay-text#readme",
+  "dependencies": {
+    "twitter-text": "^1.12.0"
+  }
+}

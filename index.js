@@ -71,7 +71,8 @@ function stripTrailingHashtags(text, strippedTags) {
 
 function linkLinks(text, links, htmlEscape) {
     var options = {
-        htmlEscapeNonEntities: htmlEscape
+        htmlEscapeNonEntities: htmlEscape,
+        target: '_blank'
     };
 
     if (typeof links === 'undefined') {
@@ -98,7 +99,8 @@ function linkHashtagsAndMentions(text, provider, htmlEscape) {
     var options = {
         htmlEscapeNonEntities: htmlEscape,
         hashtagClass: 'tagplay-hashtag',
-        usernameClass: 'tagplay-mention'
+        usernameClass: 'tagplay-mention',
+        target: '_blank'
     };
     if (provider === 'instagram') {
         options.hashtagUrlBase = 'https://instagram.com/explore/tags/';

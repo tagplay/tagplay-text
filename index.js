@@ -100,7 +100,8 @@ function linkHashtagsAndMentions(text, provider, htmlEscape) {
         htmlEscapeNonEntities: htmlEscape,
         hashtagClass: 'tagplay-hashtag',
         usernameClass: 'tagplay-mention',
-        target: '_blank'
+        target: '_blank',
+        usernameIncludeSymbol: true
     };
     if (provider === 'instagram') {
         options.hashtagUrlBase = 'https://instagram.com/explore/tags/';

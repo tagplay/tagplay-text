@@ -145,5 +145,5 @@ function htmlize(text, provider, links, strippedTags, normalize) {
 
     result = linkHashtagsAndMentions(result, provider);
 
-    return result;
+    return result.replace(/\n/g, '<br>');
 }

@@ -1,6 +1,6 @@
 {
   "name": "tagplay-text",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A text processing helper lib for Tagplay.",
   "main": "index.js",
   "scripts": {

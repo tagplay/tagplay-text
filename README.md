@@ -16,19 +16,20 @@ It heavily makes use of Twitter's [twitter-text](https://github.com/twitter/twit
 
     ...
 
-    var postHTML = tagplaytext.htmlize(post.text, post.provider.name, post.links, true, true);
+    var postHTML = tagplaytext.htmlize(post.text, post.formatting, post.provider.name, post.links, true, true);
 
 ## API
 
 This API should be considered unstable for the moment; before a 1.0.0 version is released, there may be backwards-incompatible changes in minor versions.
 
-### tagplaytext.htmlize(text, provider, links, strippedTags, normalize)
+### tagplaytext.htmlize(text, formatting, provider, links, strippedTags, normalize)
 
 The "main" function of the library, which returns an HTML representation of the provided text with links, hashtags and mentions handled appropriately. Takes five arguments:
 
 - `text`: The text that should be HTMLized.
+- `formatting`: The formatting to be used. Currently, if the formatting is `'markdown'`, the post will be parsed as as [CommonMark](http://commonmark.org); otherwise, it will be regarded as plaintext and will only be formatted to link links/hashtags and replace plain line breaks with HTML `<br>` elements.
 - `provider`: The service that hashtags/mentions should link to. Currently, tagplay-text only supports linking hashtags and mentions for Instagram and Twitter (`instagram`/`twitter`); for any other value, hashtags and mentions will not be linked.
-- `links`: An array of link entities as returned by Tagplay's API. If this is `undefined`, any URLs within the text will be automatically linked. Otherwise, each link entity has the following properties:
+- `links`: An array of link entities as returned by Tagplay's API. If this is `undefined`, any URLs within the text will be automatically linked; if it's any non-undefined, non-array value, links will not be linked. Otherwise, each link entity has the following properties:
   - `href`: The URL to be linked to.
   - `text`: The text of the link.
   - `description` (optional): A description that should be included in the title attribute of the link. Defaults to the full URL.
@@ -64,3 +65,11 @@ Returns a copy of `text` with trailing hashtags stripped as specified by the `st
 Returns a copy of `text` with the # symbol removed from all hashtags found in it. Takes one argument:
 
 - `text`: The text to be normalized.
+
+## Changelog
+
+- 0.1.0: BREAKING CHANGE: Added `formatting` parameter to `htmlize`.
+- 0.0.4: Turn newlines into `<br>` tags in `htmlize`.
+- 0.0.3: Turn on `usernameIncludeSymbol`.
+- 0.0.2: Add target="_blank" to links.
+- 0.0.1: Initial version.

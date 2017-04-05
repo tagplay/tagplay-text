@@ -1,6 +1,7 @@
 'use strict';
 
 var twttrtxt = require('twitter-text');
+var commonmark = require('commonmark');
 
 var trailingHashtagRegex = twttrtxt.regexSupplant(/\s*#{validHashtag}\s*$/i);
 
@@ -118,7 +119,7 @@ function linkHashtagsAndMentions (text, provider, htmlEscape) {
   return twttrtxt.autoLinkEntities(text, mentionEntities.concat(hashtagEntities), options);
 }
 
-function htmlize (text, provider, links, strippedTags, normalize) {
+function htmlize (text, formatting, provider, links, strippedTags, normalize) {
   var result = linkLinks(text, links, true);
 
   if (strippedTags === true) {
@@ -135,5 +136,16 @@ function htmlize (text, provider, links, strippedTags, normalize) {
 
   result = linkHashtagsAndMentions(result, provider);
 
-  return result.replace(/\n/g, '<br>');
+  if (formatting === 'markdown') {
+    var parser = new commonmark.Parser();
+    var renderer = new commonmark.HtmlRenderer();
+    renderer.softbreak = '<br>';
+
+    result = result.replace(/&gt;/g, '>'); // We've already HTML-escaped, so to make quotes work we have to unescape >
+
+    var parsed = parser.parse(result);
+    return renderer.render(parsed);
+  } else {
+    return result.replace(/\n/g, '<br>');
+  }
 }

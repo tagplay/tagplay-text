@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/tagplay/tagplay-text#readme",
   "dependencies": {
+    "commonmark": "^0.27.0",
     "twitter-text": "^1.12.0"
   }
 }

@@ -21,14 +21,14 @@ function normalizeHashtags (text) {
 function _getTrailingHashtagsIndex (text) {
   // We used to do this with a single regex, but catastrophic backtracking happened. Let's just loop through any trailing hashtags one at a time.
   var trailingTagsStart = text.length;
-  var match;
+  var match = trailingHashtagRegex.exec(text);
   while (match !== null) {
-    match = trailingHashtagRegex.exec(text.substring(0, trailingTagsStart));
     if (!match[1] || match[1].match(/^\s+$/)) {
       trailingTagsStart = match.index;
     } else {
       trailingTagsStart = match.index + 1;
     }
+    match = trailingHashtagRegex.exec(text.substring(0, trailingTagsStart));
   }
   return trailingTagsStart;
 }

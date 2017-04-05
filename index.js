@@ -122,10 +122,10 @@ function htmlize (text, provider, links, strippedTags, normalize) {
   var result = linkLinks(text, links, true);
 
   if (strippedTags === true) {
-      // Strip all tags
+    // Strip all tags
     result = stripTrailingHashtags(result);
   } else if (Object.prototype.toString.call(strippedTags) === '[object Array]') {
-      // Strip the given tags
+    // Strip the given tags
     result = stripTrailingHashtags(result, strippedTags);
   }
 

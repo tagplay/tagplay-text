@@ -120,7 +120,7 @@ function linkHashtagsAndMentions (text, provider, htmlEscape) {
 }
 
 function htmlize (text, formatting, provider, links, strippedTags, normalize) {
-  var result = linkLinks(text, links, true);
+  var result = linkLinks(text, links, formatting !== 'markdown');
 
   if (strippedTags === true) {
     // Strip all tags
@@ -138,10 +138,7 @@ function htmlize (text, formatting, provider, links, strippedTags, normalize) {
 
   if (formatting === 'markdown') {
     var parser = new commonmark.Parser();
-    var renderer = new commonmark.HtmlRenderer();
-    renderer.softbreak = '<br>';
-
-    result = result.replace(/&gt;/g, '>'); // We've already HTML-escaped, so to make quotes work we have to unescape >
+    var renderer = new commonmark.HtmlRenderer({ softbreak: '<br>' });
 
     var parsed = parser.parse(result);
     return renderer.render(parsed);

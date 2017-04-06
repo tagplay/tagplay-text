@@ -13,6 +13,23 @@ module.exports = {
   htmlize: htmlize
 };
 
+function getHashtagUrlBase (provider) {
+  var providerMap = {
+    instagram: 'https://instagram.com/explore/tags/',
+    twitter: 'https://twitter.com/hashtag/',
+    facebook: 'https://www.facebook.com/hashtag/'
+  };
+  return providerMap[provider];
+}
+
+function getUsernameUrlBase (provider) {
+  var providerMap = {
+    instagram: 'https://instagram.com/',
+    twitter: 'https://twitter.com/'
+  };
+  return providerMap[provider];
+}
+
 function normalizeHashtags (text) {
   return text.replace(twttrtxt.regexen.validHashtag, function (match, before, hash, hashText, offset, chunk) {
     return before + hashText;
@@ -96,31 +113,28 @@ function linkHashtagsAndMentions (text, provider, htmlEscape) {
     hashtagClass: 'tagplay-hashtag',
     usernameClass: 'tagplay-mention',
     target: '_blank',
-    usernameIncludeSymbol: true
+    usernameIncludeSymbol: true,
+    hashtagUrlBase: getHashtagUrlBase(provider),
+    usernameUrlBase: getUsernameUrlBase(provider)
   };
-  if (provider === 'instagram') {
-    options.hashtagUrlBase = 'https://instagram.com/explore/tags/';
-    options.usernameUrlBase = 'https://instagram.com/';
-  } else if (provider === 'twitter') {
-    options.hashtagUrlBase = 'https://twitter.com/hashtag/';
-    options.usernameUrlBase = 'https://twitter.com/';
-  } else {
-    // Unrecognized provider - just return the text
-    if (htmlEscape) {
-      return twttrtxt.htmlEscape(text);
-    } else {
-      return text;
-    }
+
+  var entities = [];
+
+  if (options.hashtagUrlBase) {
+    entities.push.apply(entities, twttrtxt.extractHashtagsWithIndices(text));
+  }
+  if (options.usernameUrlBase) {
+    entities.push.apply(entities, twttrtxt.extractMentionsWithIndices(text));
   }
 
-  var mentionEntities = twttrtxt.extractMentionsWithIndices(text);
-  var hashtagEntities = twttrtxt.extractHashtagsWithIndices(text);
-
-  return twttrtxt.autoLinkEntities(text, mentionEntities.concat(hashtagEntities), options);
+  return twttrtxt.autoLinkEntities(text, entities, options);
 }
 
 function htmlize (text, formatting, provider, links, strippedTags, normalize) {
-  var result = linkLinks(text, links, formatting !== 'markdown');
+  var result = text;
+  if (formatting !== 'markdown') {
+    result = linkLinks(result, links, true);
+  }
 
   if (strippedTags === true) {
     // Strip all tags
@@ -134,15 +148,27 @@ function htmlize (text, formatting, provider, links, strippedTags, normalize) {
     result = normalizeHashtags(result);
   }
 
-  result = linkHashtagsAndMentions(result, provider);
-
   if (formatting === 'markdown') {
     var parser = new commonmark.Parser();
-    var renderer = new commonmark.HtmlRenderer({ softbreak: '<br>' });
+    var renderer = new commonmark.HtmlRenderer({ softbreak: '<br>', safe: true });
+    // Add target="_blank" to links
+    renderer.attrs = function (node) {
+      var attrs = commonmark.HtmlRenderer.prototype.attrs.call(renderer, node);
+      if (node.type === 'link') {
+        attrs.push(['target', '_blank']);
+      }
+      return attrs;
+    };
+    // Process links/hashtags/mentions in text (but not in code etc.)
+    // linkLinks handles HTML-escaping.
+    renderer.text = function (node) {
+      this.lit(linkHashtagsAndMentions(linkLinks(node.literal, undefined, true), provider));
+    };
 
     var parsed = parser.parse(result);
     return renderer.render(parsed);
   } else {
+    result = linkHashtagsAndMentions(result, provider);
     return result.replace(/\n/g, '<br>');
   }
 }

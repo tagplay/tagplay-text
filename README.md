@@ -22,27 +22,27 @@ It heavily makes use of Twitter's [twitter-text](https://github.com/twitter/twit
 
 This API should be considered unstable for the moment; before a 1.0.0 version is released, there may be backwards-incompatible changes in minor versions.
 
-### tagplaytext.htmlize(text, formatting, provider, links, strippedTags, normalize)
+### tagplaytext.htmlize(text, options)
 
-The "main" function of the library, which returns an HTML representation of the provided text with links, hashtags and mentions handled appropriately. Takes five arguments:
+The "main" function of the library, which returns an HTML representation of the provided text with links, hashtags and mentions handled appropriately. Takes a text string that should be HTMLized and an object of options (all optional):
 
-- `text`: The text that should be HTMLized.
 - `formatting`: The formatting to be used. Currently, if the formatting is `'markdown'`, the post will be parsed as as [CommonMark](http://commonmark.org); otherwise, it will be regarded as plaintext and will only be formatted to link links/hashtags and replace plain line breaks with HTML `<br>` elements.
 - `provider`: The service that hashtags/mentions should link to. Currently, tagplay-text only supports linking hashtags and mentions for Instagram and Twitter (`instagram`/`twitter`); for any other value, hashtags and mentions will not be linked.
-- `links`: An array of link entities as returned by Tagplay's API. If this is `undefined`, any URLs within the text will be automatically linked; if it's any non-undefined, non-array value, links will not be linked. Otherwise, each link entity has the following properties:
+- `links`: An array of link entities as returned by Tagplay's API. By default, if this is undefined, any URLs within the text will be automatically linked; if it's any non-undefined, non-array value (we recommend using `false`), links will not be linked. Otherwise, each link entity has the following properties:
   - `href`: The URL to be linked to.
   - `text`: The text of the link.
   - `description` (optional): A description that should be included in the title attribute of the link. Defaults to the full URL.
   - `index`: An array of two integers representing the start and end indices of the link within the provided `text`. Note that these are proper Unicode indices, which are not necessarily equivalent to Javascript string indices.
 - `strippedTags`: Controls whether "trailing hashtags" should be stripped out of the result. "Trailing hashtags" are defined to be any valid hashtags appearing at the *end* of the provided `text`, followed and separated only by whitespace. If `strippedTags` is `true`, all such trailing hashtags will be stripped out; if `strippedTags` is an array, then any hashtags that appear in the provided array will be removed from the trailing hashtags.
 - `normalize`: A boolean indicating whether or not hashtags should be "normalized" by removing the leading #. This is useful when processing posts that include hashtagged words within them, e.g. "#Tagplay is awesome". With `normalize` set to `true`, this post will be shown simply as "Tagplay is awesome", and "Tagplay" will not be linked to search results for the #Tagplay hashtag on the relevant social network.
+- `paragraphs`: A boolean indicating whether the result should use `p` tags for paragraphs separated by multiple line breaks or only directly turn all line breaks into `br`. This has no effect if the `formatting` option is `'markdown'`.
 
 ### tagplaytext.linkLinks(text, links, htmlEscape)
 
 Returns a copy of `text` with the link entities given in `links` properly HTML-linkified within the text. Takes three arguments:
 
 - `text`: The text that should be linkified.
-- `links`: An array of link entities as returned by Tagplay's API, as described under the description of `htmlize()`. If this is `undefined, any URLs within the text will be automatically linked instead.
+- `links`: An array of link entities as returned by Tagplay's API, as described under the description of `htmlize()`. If this is `undefined`, any URLs within the text will be automatically linked instead.
 - `htmlEscape`: A boolean indicating whether the rest of the text should be HTML-escaped in the process.
 
 ### tagplaytext.linkHashtagsAndMentions(text, provider, htmlEscape)
@@ -68,6 +68,7 @@ Returns a copy of `text` with the # symbol removed from all hashtags found in it
 
 ## Changelog
 
+- 0.2.0: BREAKING CHANGE: Altered htmlize to take a map of options instead of a large number of parameters, added paragraphs option.
 - 0.1.0: BREAKING CHANGE: Added `formatting` parameter to `htmlize`.
 - 0.0.4: Turn newlines into `<br>` tags in `htmlize`.
 - 0.0.3: Turn on `usernameIncludeSymbol`.

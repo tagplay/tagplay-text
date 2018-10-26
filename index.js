@@ -130,25 +130,26 @@ function linkHashtagsAndMentions (text, provider, htmlEscape) {
   return twttrtxt.autoLinkEntities(text, entities, options);
 }
 
-function htmlize (text, formatting, provider, links, strippedTags, normalize) {
+function htmlize (text, options) {
+  if (!options) options = {};
   var result = text;
-  if (formatting !== 'markdown') {
-    result = linkLinks(result, links, true);
+  if (options.formatting !== 'markdown') {
+    result = linkLinks(result, options.links, true);
   }
 
-  if (strippedTags === true) {
+  if (options.strippedTags === true) {
     // Strip all tags
     result = stripTrailingHashtags(result);
-  } else if (Object.prototype.toString.call(strippedTags) === '[object Array]') {
+  } else if (Object.prototype.toString.call(options.strippedTags) === '[object Array]') {
     // Strip the given tags
-    result = stripTrailingHashtags(result, strippedTags);
+    result = stripTrailingHashtags(result, options.strippedTags);
   }
 
-  if (normalize) {
+  if (options.normalize) {
     result = normalizeHashtags(result);
   }
 
-  if (formatting === 'markdown') {
+  if (options.formatting === 'markdown') {
     var parser = new commonmark.Parser();
     var renderer = new commonmark.HtmlRenderer({ softbreak: '<br>', safe: true });
     // Add target="_blank" to links
@@ -162,13 +163,22 @@ function htmlize (text, formatting, provider, links, strippedTags, normalize) {
     // Process links/hashtags/mentions in text (but not in code etc.)
     // linkLinks handles HTML-escaping.
     renderer.text = function (node) {
-      this.lit(linkHashtagsAndMentions(linkLinks(node.literal, undefined, true), provider));
+      this.lit(linkHashtagsAndMentions(linkLinks(node.literal, undefined, true), options.provider));
     };
 
     var parsed = parser.parse(result);
     return renderer.render(parsed);
   } else {
-    result = linkHashtagsAndMentions(result, provider);
-    return result.replace(/\n/g, '<br>');
+    result = linkHashtagsAndMentions(result, options.provider);
+    if (options.paragraphs) {
+      var paragraphs = result.split(/\n\n+/);
+      var formatted = [];
+      for (var i = 0; i < paragraphs.length; i++) {
+        formatted.push('<p>' + paragraphs[i].replace(/\n/g, '<br>') + '</p>');
+      }
+      return formatted.join('');
+    } else {
+      return result.replace(/\n/g, '<br>');
+    }
   }
 }
